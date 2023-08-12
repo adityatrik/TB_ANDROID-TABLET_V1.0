@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "TanBlack-Tablet",
+    "slug": "TanBlack-Tablet",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "icon": "./assets/tanblack.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/tanblack.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "packagerOpts": {
+      "sourceExts": [
+        "js",
+        "ts",
+        "tsx",
+        "jsx"
+      ]
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      [
+        "expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/tanblack.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.rival_d21.TanBlackAndroid"
+    },
+    "web": {
+      "favicon": "./assets/tanblack.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b840a017-8e4e-492b-ab66-19387b3dc4e7"
+      }
+    }
+  }
+}
