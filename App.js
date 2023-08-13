@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Ionicons, FontAwesome, FontAwesome5, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import { StyleSheet,Button, Text,TextInput, View } from 'react-native';
+import { StatusBar,StyleSheet,Button, Text,TextInput, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -98,6 +98,7 @@ const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
 export default function App() {
   const theme = useTheme();
+  StatusBar.setHidden(true);
   theme.colors.secondaryContainer = "transperent"
   return (
     <NavigationContainer>
