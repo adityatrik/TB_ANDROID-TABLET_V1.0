@@ -57,10 +57,10 @@ export function Roasting({ navigation }) {
           <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#cc0f51', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textItem, { color: '#FFF' }]}>TERHUBUNG</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#6014fa', justifyContent: 'center', alignItems: 'center' }]}>
+          <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#147CB3', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textItem, { color: '#FFF' }]}>MULAI</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#6014fa', justifyContent: 'center', alignItems: 'center' }]}>
+          <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#147CB3', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textItem, { color: '#FFF' }]}>RESET</Text>
           </TouchableOpacity>
           <View style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }]}>
@@ -94,9 +94,9 @@ export function Roasting({ navigation }) {
                   step={1}
                   value={drum}
                   onValueChange={changeDrum}
-                  minimumTrackTintColor="#FF0000"
-                  maximumTrackTintColor="#FF0000"
-                  thumbTintColor="#FF0000"
+                  minimumTrackTintColor="#51AE67"
+                  maximumTrackTintColor="#51AE67"
+                  thumbTintColor="#51AE67"
                 />
                 <Text style={styles.titleText}>Drum</Text>
               </View>
@@ -109,9 +109,9 @@ export function Roasting({ navigation }) {
                   step={1}
                   value={air}
                   onValueChange={changeAir}
-                  minimumTrackTintColor="#FF0000"
-                  maximumTrackTintColor="#FF0000"
-                  thumbTintColor="#FF0000"
+                  minimumTrackTintColor="#6CB6D1"
+                  maximumTrackTintColor="#6CB6D1"
+                  thumbTintColor="#6CB6D1"
                 />
                 <Text style={styles.titleText}>Air</Text>
               </View>
@@ -171,38 +171,38 @@ export function Roasting({ navigation }) {
               <View style={[styles.colMonitor, { borderColor: '#cc0f51', backgroundColor: '#cc0f51', }]}>
                 <Text style={[styles.textItem, { color: '#fff' }]}>BT: 00</Text>
               </View>
-              <View style={[styles.colMonitor, { borderColor: '#6014fa', backgroundColor: '#6014fa', }]}>
+              <View style={[styles.colMonitor, { borderColor: '#147CB3', backgroundColor: '#147CB3', }]}>
                 <Text style={[styles.textItem, { color: '#fff' }]}>ET: 00</Text>
               </View>
               <View style={[styles.colMonitor, { borderColor: '#cc0f51', backgroundColor: '#fff', }]}>
                 <Text style={[styles.textItem, { color: '#cc0f51' }]}>△BT: 00</Text>
               </View>
               <TouchableOpacity style={[styles.colMonitor, { borderColor: '#cc0f51', backgroundColor: '#cc0f51', }]}>
-                <Text style={[styles.textItem, { color: '#FFF' }]}>IGNITION</Text>
+                <Text style={[styles.textEvent, { color: '#FFF' }]}>IGNITION</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.colMonitor, { borderColor: '#6014fa', backgroundColor: '#6014fa', }]}>
-                <Text style={[styles.textItem, { color: '#FFF' }]}>COOLING</Text>
+              <TouchableOpacity style={[styles.colMonitor, { borderColor: '#60F8F9', backgroundColor: '#60F8F9', }]}>
+                <Text style={[styles.textEvent, { color: '#FFF' }]}>COOLING</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
         <View style={[styles.row, { height: row3Height }]}>
-          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6014fa', justifyContent: 'center', alignItems: 'center' }]}>
+          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textEvent, { color: '#FFF' }]}>CHARGE</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6014fa', justifyContent: 'center', alignItems: 'center' }]}>
+          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textEvent, { color: '#FFF' }]}>DRY END</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6014fa', justifyContent: 'center', alignItems: 'center' }]}>
+          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textEvent, { color: '#FFF' }]}>FC START</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6014fa', justifyContent: 'center', alignItems: 'center' }]}>
+          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textEvent, { color: '#FFF' }]}>FC END</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6014fa', justifyContent: 'center', alignItems: 'center' }]}>
+          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textEvent, { color: '#FFF' }]}>SC START</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6014fa', justifyContent: 'center', alignItems: 'center' }]}>
+          <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
             <Text style={[styles.textEvent, { color: '#FFF' }]}>DROP</Text>
           </TouchableOpacity>
 
@@ -240,13 +240,13 @@ const styles = StyleSheet.create({
     // marginTop: 10,
     color: '#000',
     fontWeight: 'bold',
-    fontSize: 25,
+    fontSize: 20,
   },
   textEvent: {
     // marginTop: 10,
     color: '#000',
     fontWeight: 'bold',
-    fontSize: 22,
+    fontSize: 20,
   },
   boxSlider: {
     // marginStart: -210,
@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
     color: '#000',
     // marginLeft: -10,
     // flex: 1,
-    fontSize: 14,
+    fontSize: 10,
     // marginStart: 10,
     // transform: [{ rotate: '90deg' }]
   },
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     // marginLeft: -10,
     // flex: 1,
-    fontSize: 14,
+    fontSize: 10,
     // transform: [{ rotate: '90deg' }]
   },
   innerCol: {

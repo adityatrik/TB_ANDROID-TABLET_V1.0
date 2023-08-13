@@ -8,10 +8,10 @@ const DATA = [
   {
     user_id: '1',
     user_username: 'admin',
-    user_nama: 'Rival',
-    user_email: 'rdindrawan2@gmail.com',
+    user_nama: 'Adit',
+    user_email: 'adityatrik1@gmail.com',
     user_nomor: '088970186806',
-    user_alamat: 'Jl. Elang Jawa, Sleman, Yogyakarta',
+    user_alamat: 'Jl. Kaliurang, Sleman, Yogyakarta',
     user_hak_akses: 'admin',
   },
    
@@ -62,11 +62,11 @@ const UserImageContainer = () => {
       <View style={styles.userContainerImage} >
         <Image
           style={styles.tinyLogo}
-          source={require('../../assets/image/profile.jpg')}
+          source={require('../../assets/image/foto.jpg')}
         />
         <View>
           <Text  style={[styles.userTitleName]}>
-           Rival Dwiky Indrawan
+           Aditya Tri Kurniawan
           </Text>
           <Text  style={[styles.userRole]}>
           Admin
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
      },
 
      profileContiner:{
-      marginTop: 20,
+      marginTop: 10,
       borderRadius:15,
       backgroundColor:'#4e4e4e',
       padding:20,
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     },
     userContainerTitle:{
       fontSize:24,
-      marginTop:60,
+      marginTop:10,
       marginBottom: 20,
       fontWeight: 'bold',
       color:'red'

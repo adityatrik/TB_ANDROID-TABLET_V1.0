@@ -10,60 +10,65 @@ export function Beranda({navigation}) {
   return (
     <ScrollView style={styles.container}>
       <TitleBarContent></TitleBarContent>
-   
-        <View style={styles.infoContainer}>
-          <View>
-            <Text style={styles.textHeader}><Feather name="list" size={20} color="black" /> Daftar Roaster:</Text>
-          </View>
-          <View style={styles.line} />
-          <View style={styles.containerPencarian}>
-            <TextInput
-              style={styles.input}
-              placeholder="Cari..."
-            />
-            <TouchableOpacity style={styles.button}>
-              <Text style={styles.textPutih}>Cari Data</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.infoGelap}>
-            <View style={styles.row}>
-              <View style={styles.column}>
-                <Text style={styles.keterangan}>ID : TB0819</Text>
-                <Text style={styles.keterangan}>TIPE MESIN: Electric</Text>
-              </View>
-              <View style={styles.column}>
-                <Text style={styles.statusOnline}>Online</Text>
-              </View>
+      <View style={styles.row}>
+        <View style={styles.column}>
+          <View style={styles.infoContainer}>
+            <View>
+              <Text style={styles.textHeader}><Feather name="list" size={20} color="black" /> Daftar Mesin Roaster:</Text>
             </View>
-            <TouchableOpacity style={styles.buttonMerah} >
-              <Text style={styles.textPutih}>Mulai Roasting</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonGray} >
-              <Text style={styles.textPutih}>Profile Mesin</Text>
+            <View style={styles.line} />
+            <View style={styles.containerPencarian}>
+              <TextInput
+                style={styles.input}
+                placeholder="Cari..."
+              />
+              <TouchableOpacity style={styles.button}>
+                <Text style={styles.textPutih}>Cari Data</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.infoGelap}>
+              <View style={styles.row}>
+                <View style={styles.column}>
+                  <Text style={styles.keterangan}>ID : TB0819</Text>
+                  <Text style={styles.keterangan}>TIPE MESIN: Electric</Text>
+                </View>
+                <View style={styles.column}>
+                  <Text style={styles.statusOnline}>Online</Text>
+                </View>
+              </View>
+              <TouchableOpacity style={styles.buttonMerah} >
+                <Text style={styles.textPutih}>Mulai Roasting</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonGray} >
+                <Text style={styles.textPutih}>Profile Mesin</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity style={styles.buttonAbu} >
+                <Text style={styles.textPutih}><AntDesign name="plussquare" size={16} /> Tambah Mesin</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.buttonAbu} >
-              <Text style={styles.textPutih}><AntDesign name="plussquare" size={16} /> Tambah Mesin</Text>
-          </TouchableOpacity>
         </View>
-        <View style={styles.infoContainer}>
-          <View>
-            <Text style={styles.textHeader}>Profile Mesin:</Text>
-          </View>
-          <View style={styles.line} />
-          <View style={styles.infoTerang}>
-            <Text style={styles.keterangan}>ID : TB0819</Text>
-            <Text style={styles.keterangan}>Nama: Mesin Roaster 1 Kg</Text>
-            <Text style={styles.keterangan}>Tipe: Electric</Text>
-            <Text style={styles.keterangan}>Serial Number: Electric</Text>
-            <Text style={styles.keterangan}>Protokol: Modbus</Text>
-            <Text style={styles.keterangan}>Host: 192.168.0.101</Text>
-            <Text style={styles.keterangan}>Port: 1883</Text>
-            <TouchableOpacity style={styles.buttonMerah} onPress={() => setModalVisible(true)} >
-              <Text style={styles.textPutih}><FontAwesome name="edit" size={16} /> Ubah</Text>
-            </TouchableOpacity>
+        <View style={styles.column}>
+          <View style={styles.infoContainer}>
+            <View>
+              <Text style={styles.textHeader}>Profile Mesin:</Text>
+            </View>
+            <View style={styles.line} />
+            <View style={styles.infoTerang}>
+              <Text style={styles.keterangan}>ID : TB0819</Text>
+              <Text style={styles.keterangan}>Nama: Mesin Roaster 1 Kg</Text>
+              <Text style={styles.keterangan}>Tipe: Electric</Text>
+              <Text style={styles.keterangan}>Serial Number: Electric</Text>
+              <Text style={styles.keterangan}>Protokol: Modbus</Text>
+              <Text style={styles.keterangan}>Host: 192.168.0.101</Text>
+              <Text style={styles.keterangan}>Port: 1883</Text>
+              <TouchableOpacity style={styles.buttonMerah} onPress={() => setModalVisible(true)} >
+                <Text style={styles.textPutih}><FontAwesome name="edit" size={16} /> Ubah</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
+      </View>
 
         <View style={styleModal.centeredView}>
       <Modal
@@ -152,7 +157,7 @@ const styles = StyleSheet.create({
   infoContainer: {
       backgroundColor: '#fff',
       padding: 15,
-      marginHorizontal: 20,
+      marginHorizontal: 5,
       marginVertical: 10,
       borderRadius: 8,
   },
