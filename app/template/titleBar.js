@@ -14,7 +14,7 @@ const TitleMenu = () => {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop:5, 
+        marginTop:0, 
         marginBottom: 15   
       },
     ]}>

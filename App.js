@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Ionicons, FontAwesome, FontAwesome5, AntDesign, MaterialCommunityIcons } from '@expo/vector-icons';
-import { StatusBar,StyleSheet,Button, Text,TextInput, View } from 'react-native';
+import { StatusBar, StyleSheet, Button, Text, TextInput, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -8,7 +8,7 @@ import { useTheme } from 'react-native-paper';
 import 'react-native-gesture-handler';
 
 // Page
-import {Beranda} from './app/beranda/beranda';
+import { Beranda } from './app/beranda/beranda';
 import { Login } from './app/login/login';
 import { LupaPassword } from './app/login/lupaPassword';
 import { Roasting } from './app/roasting/roasting';
@@ -28,7 +28,7 @@ function MenuD() {
               : 'ios-information-circle-outline';
           } else if (route.name === 'Settings') {
             iconName = focused ? 'ios-list' : 'ios-list-outline';
-          } else if(route.name === 'CreatePost'){
+          } else if (route.name === 'CreatePost') {
             iconName = focused ? 'ios-list' : 'ios-list-outline';
           }
 
@@ -37,58 +37,58 @@ function MenuD() {
         },
         tabBarActiveTintColor: 'tomato',
         tabBarInactiveTintColor: 'gray',
-        
+
       })}
       activeColor="#FF0000"
       barStyle={{ backgroundColor: '#000' }}
     >
-       
-      <Tab.Screen 
-        name="Home" 
-        component={Beranda} 
+
+      <Tab.Screen
+        name="Home"
+        component={Beranda}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome name="home" size={24} color={ color } />
+            <FontAwesome name="home" size={24} color={color} />
           ),
         }}
       />
-      <Tab.Screen 
-      name="Roasting" 
-      component={Roasting}
-      options={{
-        tabBarIcon: ({ color }) => (
-          <MaterialCommunityIcons name="toaster-oven" size={24} color={ color } />
+      <Tab.Screen
+        name="Roasting"
+        component={Roasting}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="toaster-oven" size={24} color={color} />
           ),
         }}
-       />
-      <Tab.Screen 
-      name="Log" 
-      component={Log}
-      options={{
-        tabBarIcon: ({ color }) => (
-          <MaterialCommunityIcons name="note-edit-outline" size={24} color={ color } />
+      />
+      <Tab.Screen
+        name="Log"
+        component={Log}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="note-edit-outline" size={24} color={color} />
           ),
         }}
-       />
-        <Tab.Screen
-          name="Setting"
-          component={Setting}
-          options={{
-            tabBarIcon: ({ color }) => (
-              <AntDesign name="setting" size={24} color={ color } />
-            ),
-          }}
-        />
-      <Tab.Screen 
-      name="Profile" 
-      component={Profile}
-      options={{
-        headerShown: false,
-        tabBarIcon: ({ color }) => (
-          <AntDesign name="user" size={24} color={ color } />
-        ),
-      }}
-       />
+      />
+      <Tab.Screen
+        name="Setting"
+        component={Setting}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <AntDesign name="setting" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <AntDesign name="user" size={24} color={color} />
+          ),
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -104,11 +104,11 @@ export default function App() {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-        <Stack.Screen name="Log" component={Log} options={{ headerShown: false }} />
+        <Stack.Screen name="Log" component={Login} options={{ headerShown: false }} />
         <Stack.Screen name="LupaPassword" component={LupaPassword} options={{ headerShown: false }} />
-         <Stack.Screen name="MenuD" component={MenuD} options={{ headerShown: false }} />
+        <Stack.Screen name="MenuD" component={MenuD} options={{ headerShown: false }} />
       </Stack.Navigator>
-  </NavigationContainer>
+    </NavigationContainer>
   );
 }
 
@@ -119,15 +119,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaButton:{
-    margin:7,
+  ctaButton: {
+    margin: 7,
     alignItems: 'left',
   },
   containerSetting: {
     flex: 1,
-    paddingTop:40,
+    paddingTop: 40,
   },
-  navigationTop:{
-    marginTop:25,
+  navigationTop: {
+    marginTop: 25,
   }
 });

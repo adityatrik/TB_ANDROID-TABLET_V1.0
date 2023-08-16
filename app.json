@@ -3,7 +3,7 @@
     "name": "TanBlack-Android",
     "slug": "TanBlack-Android",
     "version": "1.0.0",
-    "orientation": "landscape",
+    "orientation": "auto",
     "icon": "./assets/tanblack.png",
     "userInterfaceStyle": "dark",
     "splash": {
