@@ -3,7 +3,7 @@
     "name": "TanBlack-Android",
     "slug": "TanBlack-Android",
     "version": "1.0.0",
-    "orientation": "landscape",
+    "orientation": "portrait",
     "icon": "./assets/tanblack.png",
     "userInterfaceStyle": "dark",
     "splash": {
@@ -45,7 +45,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "b840a017-8e4e-492b-ab66-19387b3dc4e7"
+        "projectId": "b29d7a1a-909d-4628-b5ab-9b150c6473b5"
       }
     }
   }

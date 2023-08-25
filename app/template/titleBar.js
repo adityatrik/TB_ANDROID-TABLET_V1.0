@@ -15,14 +15,14 @@ const TitleMenu = () => {
         justifyContent: 'center',
         alignItems: 'center',
         marginTop:0, 
-        marginBottom: 15   
+        marginBottom: 5   
       },
     ]}>
     <Image
     style={styles.tinyLogo}
-    source={require('../../assets/image/logo.jpg')}
+    source={require('../../assets/tanblack-1.png')}
     />
-    <Text  style={[ styles.NotifikasiTitle,]} > TAN & BLACK </Text>
+    {/* <Text  style={[ styles.NotifikasiTitle,]} > TAN & BLACK </Text> */}
   </View >
 
   );
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     ButtonUbahProfile:{
       marginTop:23,
     },tinyLogo: {
-        width: 50,
-        height:50,
+        width: 300,
+        height: 50,
         borderRadius:15
       },
       logo: {

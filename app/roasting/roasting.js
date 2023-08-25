@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Switch,FlatList, Modal, TouchableOpacity, View, StyleSheet, Dimensions, ScrollView, Text, SafeAreaView } from 'react-native';
+import { Switch, FlatList, Modal, TouchableOpacity, View, StyleSheet, Dimensions, ScrollView, Text, SafeAreaView } from 'react-native';
 import Slider from '@react-native-community/slider';
 import RF from 'react-native-responsive-fontsize';
 // import { LineChart } from 'react-native-svg-charts';
 import { LineChart } from 'react-native-chart-kit';
 import TitleBarContent from '../template/titleBar';
-import { Entypo } from '@expo/vector-icons';
-
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
+import { VictoryBar, VictoryChart, VictoryLine, VictoryLabel, VictoryTooltip, VictoryTheme, VictoryAxis } from "victory-native";
 
 const DataMesin = [
   {
@@ -33,9 +30,26 @@ const DataMesin = [
   },
 ];
 
+const data = [
+  [{ x: 0, y: 0 }, { x: 2, y: 10 }, { x: 10, y: 200 }, { x: 15, y: 250 }],
+  [{ x: 0, y: 0 }, { x: 2, y: 10 }, { x: 10, y: 20 }, { x: 4, y: 20 }, { x: 15, y: 25 }],
+  // [{ x: 0, y: 0 }, { x: 2, y:10 }, { x: 3, y:0 },{ x: 4, y: 10 }, { x: 15, y: 15 }],
+];
+
+const maxima = data.map(
+  (dataset) => Math.max(...dataset.map((d) => d.y))
+);
+
+const xOffsets = [50, 555];
+const tickPadding = [0, -18];
+const anchors = ["end", "start"];
+const colors = ["blue", "red"];
+
 export function Roasting({ navigation }) {
 
   const [modalVisible, setModalVisible] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
+  const [windowHeight, setWindowHeight] = useState(Dimensions.get('window').height);
 
   const totalColumnsRow1 = 4;
   const totalColumnsRow2 = 3;
@@ -47,6 +61,7 @@ export function Roasting({ navigation }) {
   const portraitColumnsRow4 = 1;
   const portraitColumnsRow5 = 6;
   const portraitColumnsRow6 = 2;
+  const portraitColumnsRow7 = 5;
   const totalHeight = windowHeight - 100; // Total tinggi sel pada baris 1-3
 
   const portraitCellSize1 = windowWidth / portraitColumnsRow1 - 10;
@@ -55,6 +70,7 @@ export function Roasting({ navigation }) {
   const portraitCellSize4 = windowWidth / portraitColumnsRow4 - 10;
   const portraitCellSize5 = windowWidth / portraitColumnsRow5 - 10;
   const portraitCellSize6 = windowWidth / portraitColumnsRow6 - 10;
+  const portraitCellSize7 = windowWidth / portraitColumnsRow7 - 10;
 
   const portraitRowHeight1 = (totalHeight * 0.5) / 10;
   const portraitRowHeight2 = (totalHeight * 3.5) / 10;
@@ -72,6 +88,16 @@ export function Roasting({ navigation }) {
   const row2Height = (totalHeight * 6) / 10;
   const row3Height = (totalHeight * 1) / 10;
 
+  const xOffsetsPortrait = [50, portraitCellSize4 - 50];
+  const handleDimensionsChange = ({ window }) => {
+    const { width, height } = window;
+    setWindowWidth(width);
+    setWindowHeight(height);
+    // Lakukan sesuatu dengan dimensi yang baru.
+  };
+
+  Dimensions.addEventListener('change', handleDimensionsChange);
+
   const lineChartData = {
     labels: ['1Min', '2Min', '3Min', '4Min', '5Min', '6Min'],
     datasets: [
@@ -83,6 +109,7 @@ export function Roasting({ navigation }) {
   };
 
   const [air, setAir] = useState(0);
+  const [sv, setSv] = useState(0);
   const [burner, setBurner] = useState(0);
   const [drum, setDrum] = useState(0);
 
@@ -94,6 +121,9 @@ export function Roasting({ navigation }) {
   };
   const changeDrum = (newValue) => {
     setDrum(newValue);
+  };
+  const changeSv = (newValue) => {
+    setSv(newValue);
   };
   const [orientation, setOrientation] = useState('portrait');
 
@@ -109,8 +139,14 @@ export function Roasting({ navigation }) {
 
   const [igniter, setIgniter] = useState(false);
   const [cooling, setCooling] = useState(false);
+  const [agitator, setAgitator] = useState(false);
+  const [lamp, setLamp] = useState(false);
+  const [auto, setAuto] = useState(false);
   const toggleSwitchIgniter = () => setIgniter(previousState => !previousState);
   const toggleSwitchCooling = () => setCooling(previousState => !previousState);
+  const toggleSwitchAgitator = () => setAgitator(previousState => !previousState);
+  const toggleSwitchLamp = () => setLamp(previousState => !previousState);
+  const toggleSwitchAuto = () => setAuto(previousState => !previousState);
 
   useEffect(() => {
     const { width, height } = Dimensions.get('window');
@@ -136,7 +172,6 @@ export function Roasting({ navigation }) {
         row: {
           flexDirection: 'row',
           marginBottom: 10,
-          marginBottom: 5
         },
         rowSlider: {
           flexDirection: 'row',
@@ -458,13 +493,13 @@ export function Roasting({ navigation }) {
         <ScrollView>
           <TitleBarContent></TitleBarContent>
           <View style={[styles.row, { height: row1Height }]}>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#cc0f51', justifyContent: 'center', alignItems: 'center' }]}>
-              <Text style={[styles.textItem, { color: '#FFF' }]}>TERHUBUNG</Text>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#666262', justifyContent: 'center', alignItems: 'center' }]}>
+              <Text style={[styles.textItem, { color: '#FFF' }]}>SETUP PROFILE</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#147CB3', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#24CF15', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textItem, { color: '#FFF' }]}>MULAI</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#147CB3', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#ff6708', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textItem, { color: '#FFF' }]}>RESET</Text>
             </TouchableOpacity>
             <View style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }]}>
@@ -479,7 +514,7 @@ export function Roasting({ navigation }) {
                 style={styles.slider}
                 minimumValue={0}
                 maximumValue={100}
-                step={1}
+                step={5}
                 value={drum}
                 onValueChange={changeDrum}
                 minimumTrackTintColor="#FF0000"
@@ -495,7 +530,7 @@ export function Roasting({ navigation }) {
                     style={styles.slider}
                     minimumValue={0}
                     maximumValue={100}
-                    step={1}
+                    step={5}
                     value={drum}
                     onValueChange={changeDrum}
                     minimumTrackTintColor="#51AE67"
@@ -510,7 +545,7 @@ export function Roasting({ navigation }) {
                     style={styles.slider}
                     minimumValue={0}
                     maximumValue={100}
-                    step={1}
+                    step={5}
                     value={air}
                     onValueChange={changeAir}
                     minimumTrackTintColor="#6CB6D1"
@@ -525,7 +560,7 @@ export function Roasting({ navigation }) {
                     style={styles.slider}
                     minimumValue={0}
                     maximumValue={100}
-                    step={1}
+                    step={5}
                     value={burner}
                     onValueChange={changeBurner}
                     minimumTrackTintColor="#FF0000"
@@ -536,8 +571,36 @@ export function Roasting({ navigation }) {
                 </View>
               </View>
             </View>
-            <View style={[styles.cell, { width: cellSizeRow2_2, marginLeft: 5, marginRight: 5, backgroundColor: 'white' }]}>
-              <LineChart
+            <View style={[styles.cell, { width: cellSizeRow2_2, marginLeft: 5, marginRight: 5, backgroundColor: '#000', borderColor: '#fff' }]}>
+              <VictoryChart
+                theme={VictoryTheme.material}
+                width={cellSizeRow2_2} height={row2Height}
+                domain={{ y: [0, 1] }}
+              >
+                <VictoryAxis />
+                {data.map((d, i) => (
+                  <VictoryAxis dependentAxis
+                    key={i}
+                    offsetX={xOffsets[i]}
+                    style={{
+                      axis: { stroke: 'white' },
+                      ticks: { padding: tickPadding[i] },
+                      tickLabels: { fill: 'white', textAnchor: anchors[i] }
+                    }}
+                    tickValues={[0.25, 0.5, 0.75, 1]}
+                    tickFormat={(t) => t * maxima[i]}
+                  />
+                ))}
+                {data.map((d, i) => (
+                  <VictoryLine
+                    key={i}
+                    data={d}
+                    style={{ data: { stroke: colors[i] } }}
+                    y={(datum) => datum.y / maxima[i]}
+                  />
+                ))}
+              </VictoryChart>
+              {/* <LineChart
                 data={lineChartData}
                 width={cellSizeRow2_2 - 4}
                 height={row2Height - 5}
@@ -568,7 +631,7 @@ export function Roasting({ navigation }) {
                   borderRadius: 18,
                   margin: 2
                 }}
-              />
+              /> */}
             </View>
             <View style={[styles.cell, { width: cellSizeRow2_3, marginLeft: 5, marginRight: 5, backgroundColor: 'white' }]}>
               <View style={[styles.innerColMonitor, { height: row2Height }]}>
@@ -578,49 +641,50 @@ export function Roasting({ navigation }) {
                 <View style={[styles.colMonitor, { borderColor: '#147CB3', backgroundColor: '#147CB3', }]}>
                   <Text style={[styles.textItem, { color: '#fff' }]}>ET: 00</Text>
                 </View>
-                <View style={[styles.colMonitor, { borderColor: '#cc0f51', backgroundColor: '#fff', }]}>
+                <View style={[styles.colMonitor, { borderColor: '#ff6708', backgroundColor: '#fff', }]}>
                   <Text style={[styles.textItem, { color: '#cc0f51' }]}>△BT: 00</Text>
                 </View>
-                <TouchableOpacity style={[styles.colMonitor, { borderColor: '#cc0f51', backgroundColor: '#cc0f51', }]}>
-                  <Text style={[styles.textEvent, { color: '#FFF' }]}>IGNITION</Text>
+                <TouchableOpacity style={[styles.colMonitor, { borderColor: '#EA1F1F', backgroundColor: '#EA1F1F', }]}>
+                  <Text style={[styles.textEvent, { color: '#FFF' }]}>IGNITER</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.colMonitor, { borderColor: '#60F8F9', backgroundColor: '#60F8F9', }]}>
+                <TouchableOpacity style={[styles.colMonitor, { borderColor: '#147CB3', backgroundColor: '#147CB3', }]}>
                   <Text style={[styles.textEvent, { color: '#FFF' }]}>COOLING</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
           <View style={[styles.row, { height: row3Height }]}>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#666262', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textEvent, { color: '#FFF' }]}>CHARGE</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#666262', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textEvent, { color: '#FFF' }]}>DRY END</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#666262', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textEvent, { color: '#FFF' }]}>FC START</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#666262', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textEvent, { color: '#FFF' }]}>FC END</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#666262', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textEvent, { color: '#FFF' }]}>SC START</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#6CB6D1', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity style={[styles.cell, { width: cellSizeRow3, marginLeft: 5, marginRight: 5, backgroundColor: '#666262', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textEvent, { color: '#FFF' }]}>DROP</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       );
     } else {
-      const fontTitleMonitorSize = portraitCellSize1 * 0.12;
-      const fontValueSliderSize = portraitCellSize1 * 0.15;
-      const fontValueMonitorSize = portraitCellSize1 * 0.20;
-      const fontStatusSize = portraitCellSize1 * 0.10;
+      const fontTitleMonitorSize = portraitCellSize1 * 0.08;
+      const fontValueSliderSize = portraitCellSize1 * 0.09;
+      const fontValueMonitorSize = portraitCellSize1 * 0.15;
+      const fontEventSize = portraitCellSize1 * 0.10;
+      const fontStatusSize = portraitCellSize1 * 0.08;
       return (
         <ScrollView contentContainerStyle={styles.container}>
           <TitleBarContent></TitleBarContent>
-          <View style={[stylesPortrait.row, { marginTop: 10 }]}>
+          <View style={[stylesPortrait.row, { marginTop: 20 }]}>
             <View style={[stylesPortrait.cell, { width: portraitCellSize1, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, borderColor: '#FFF', backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }]} >
               <Text style={[stylesPortrait.textTitleMonitor, { color: '#FFF', fontSize: fontTitleMonitorSize }]}>BT (C)</Text>
               <Text style={[stylesPortrait.textValueMonitor, { color: '#cc0f51', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>200</Text>
@@ -640,7 +704,7 @@ export function Roasting({ navigation }) {
           </View>
           <View style={stylesPortrait.row}>
             <View style={[stylesPortrait.cell, { width: portraitCellSize2, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#24CF15', borderColor: '#24CF15' }]} >
-              <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>START</Text>
+              <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>MULAI</Text>
             </View>
             <View style={[stylesPortrait.cell, { width: portraitCellSize2, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ff6708', borderColor: '#ff6708' }]} >
               <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>RESET</Text>
@@ -650,12 +714,63 @@ export function Roasting({ navigation }) {
             </View>
           </View>
           <View style={stylesPortrait.row}>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize3, height: portraitRowHeight3, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
+            <View style={[stylesPortrait.cell, { width: portraitCellSize3, height: portraitRowHeight3, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]} >
               <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontStatusSize }]}>Menunggu Koneksi Mesin ...</Text>
             </View>
           </View>
           <View style={stylesPortrait.row}>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight2, marginLeft: 5, marginRight: 5 }]} />
+            <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight2, marginLeft: 5, marginRight: 5, }]} >
+              <View style={[stylesPortrait.cell, { marginHorizontal: 12, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginBottom: -35, marginTop: 10, borderColor: '#000' }]}>
+                <View style={[stylesPortrait.cell, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderColor: '#000', marginHorizontal: 5 }]}>
+                  <View style={[stylesPortrait.cell, { width: 12, height: 12, justifyContent: 'center', alignItems: 'center', borderColor: '#cc0f51', backgroundColor: '#cc0f51' }]} />
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize, marginLeft: 3 }]}>BT</Text>
+                </View>
+                <View style={[stylesPortrait.cell, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderColor: '#000', marginHorizontal: 5 }]}>
+                  <View style={[stylesPortrait.cell, { width: 12, height: 12, justifyContent: 'center', alignItems: 'center', borderColor: '#147CB3', backgroundColor: '#147CB3' }]} />
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize, marginLeft: 3 }]}>ET</Text>
+                </View>
+                <View style={[stylesPortrait.cell, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderColor: '#000', marginHorizontal: 5 }]}>
+                  <View style={[stylesPortrait.cell, { width: 12, height: 12, justifyContent: 'center', alignItems: 'center', borderColor: '#cc0f51', backgroundColor: '#ff6708' }]} />
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize, marginLeft: 3 }]}>RoR</Text>
+                </View>
+                <View style={[stylesPortrait.cell, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderColor: '#000', marginHorizontal: 5 }]}>
+                  <View style={[stylesPortrait.cell, { width: 12, height: 12, justifyContent: 'center', alignItems: 'center', borderColor: '#FF0000', backgroundColor: '#FF0000' }]} />
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize, marginLeft: 3 }]}>Burner</Text>
+                </View>
+                <View style={[stylesPortrait.cell, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderColor: '#000', marginHorizontal: 5 }]}>
+                  <View style={[stylesPortrait.cell, { width: 12, height: 12, justifyContent: 'center', alignItems: 'center', borderColor: '#6CB6D1', backgroundColor: '#6CB6D1' }]} />
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize, marginLeft: 3 }]}>Air</Text>
+                </View>
+              </View>
+              <VictoryChart
+                theme={VictoryTheme.material}
+                width={portraitCellSize4} height={portraitRowHeight2 + 20}
+                domain={{ y: [0, 1] }}
+              >
+                <VictoryAxis />
+                {data.map((d, i) => (
+                  <VictoryAxis dependentAxis
+                    key={i}
+                    offsetX={xOffsetsPortrait[i]}
+                    style={{
+                      axis: { stroke: 'white' },
+                      ticks: { padding: tickPadding[i] },
+                      tickLabels: { fill: 'white', textAnchor: anchors[i] }
+                    }}
+                    tickValues={[0.2, 0.4, 0.6, 0.8, 1]}
+                    tickFormat={(t) => t * maxima[i]}
+                  />
+                ))}
+                {data.map((d, i) => (
+                  <VictoryLine
+                    key={i}
+                    data={d}
+                    style={{ data: { stroke: colors[i] } }}
+                  // y={(datum) => datum.y / maxima[i]}
+                  />
+                ))}
+              </VictoryChart>
+            </View>
           </View>
           <View style={stylesPortrait.row}>
             <View style={[stylesPortrait.cell, { width: portraitCellSize5, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#666262', borderColor: '#666262' }]} >
@@ -671,86 +786,158 @@ export function Roasting({ navigation }) {
               <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>FC E</Text>
             </View>
             <View style={[stylesPortrait.cell, { width: portraitCellSize5, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#666262', borderColor: '#666262' }]} >
-              <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>SC E</Text>
+              <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>SC</Text>
             </View>
             <View style={[stylesPortrait.cell, { width: portraitCellSize5, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#666262', borderColor: '#666262' }]} >
               <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>DROP</Text>
             </View>
           </View>
-          <View style={stylesPortrait.row}>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 15 }]} >
-              <Text style={stylesPortrait.titleText}>Burner</Text>
-              <Slider
-                style={stylesPortrait.slider}
-                minimumValue={0}
-                maximumValue={100}
-                step={1}
-                value={burner}
-                onValueChange={changeBurner}
-                minimumTrackTintColor="#FF0000"
-                maximumTrackTintColor="#FF0000"
-                thumbTintColor="#FF0000"
-              />
-              <View style={[stylesPortrait.cell, { width: '10%', justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]}>
-                <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize }]}>{burner}</Text>
+          <ScrollView>
+            <View style={stylesPortrait.row}>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 15 }]} >
+                <Text style={stylesPortrait.titleText}>SV       </Text>
+                <Slider
+                  style={stylesPortrait.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={5}
+                  value={sv}
+                  onValueChange={changeSv}
+                  minimumTrackTintColor="#FF0000"
+                  maximumTrackTintColor="#FF0000"
+                  thumbTintColor="#FF0000"
+                />
+                <View style={[stylesPortrait.cell, { width: '10%', justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]}>
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize }]}>{sv}</Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View style={stylesPortrait.row}>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 15 }]} >
-              <Text style={stylesPortrait.titleText}>Air       </Text>
-              <Slider
-                style={stylesPortrait.slider}
-                minimumValue={0}
-                maximumValue={100}
-                step={1}
-                value={air}
-                onValueChange={changeAir}
-                minimumTrackTintColor="#6CB6D1"
-                maximumTrackTintColor="#6CB6D1"
-                thumbTintColor="#6CB6D1"
-              />
-              <View style={[stylesPortrait.cell, { width: '10%', justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]}>
-                <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize }]}>{burner}</Text>
+            <View style={stylesPortrait.row}>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 15 }]} >
+                <Text style={stylesPortrait.titleText}>Burner</Text>
+                <Slider
+                  style={stylesPortrait.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={5}
+                  value={burner}
+                  onValueChange={changeBurner}
+                  minimumTrackTintColor="#FF0000"
+                  maximumTrackTintColor="#FF0000"
+                  thumbTintColor="#FF0000"
+                />
+                <View style={[stylesPortrait.cell, { width: '10%', justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]}>
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize }]}>{burner}</Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View style={stylesPortrait.row}>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 15 }]} >
-              <Text style={stylesPortrait.titleText}>Drum   </Text>
-              <Slider
-                style={stylesPortrait.slider}
-                minimumValue={0}
-                maximumValue={100}
-                step={1}
-                value={drum}
-                onValueChange={changeDrum}
-                minimumTrackTintColor="#51AE67"
-                maximumTrackTintColor="#51AE67"
-                thumbTintColor="#51AE67"
-              />
-              <View style={[stylesPortrait.cell, { width: '10%', justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]}>
-                <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize }]}>{burner}</Text>
+            <View style={stylesPortrait.row}>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 15 }]} >
+                <Text style={stylesPortrait.titleText}>Air       </Text>
+                <Slider
+                  style={stylesPortrait.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={5}
+                  value={air}
+                  onValueChange={changeAir}
+                  minimumTrackTintColor="#6CB6D1"
+                  maximumTrackTintColor="#6CB6D1"
+                  thumbTintColor="#6CB6D1"
+                />
+                <View style={[stylesPortrait.cell, { width: '10%', justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]}>
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize }]}>{air}</Text>
+                </View>
               </View>
             </View>
-          </View>
-          <View style={stylesPortrait.row}>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize6, height: portraitRowHeight1, marginLeft: 5, marginRight: 5,justifyContent:'center',alignItems:'center',flexDirection: 'row' }]} >
-              <Text style={[stylesPortrait.textValueMonitor,{color:'#fff',fontWeight:'bold',color:'#fff'}]}>IGINITER</Text>
-              <Switch
+            <View style={stylesPortrait.row}>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 15 }]} >
+                <Text style={stylesPortrait.titleText}>Drum   </Text>
+                <Slider
+                  style={stylesPortrait.slider}
+                  minimumValue={0}
+                  maximumValue={100}
+                  step={5}
+                  value={drum}
+                  onValueChange={changeDrum}
+                  minimumTrackTintColor="#51AE67"
+                  maximumTrackTintColor="#51AE67"
+                  thumbTintColor="#51AE67"
+                />
+                <View style={[stylesPortrait.cell, { width: '10%', justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]}>
+                  <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize }]}>{drum}</Text>
+                </View>
+              </View>
+            </View>
+            <View style={stylesPortrait.row}>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>IGINITER</Text>
+                <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
                   thumbColor={igniter ? "#EA1F1F" : "#f4f3f4"}
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchIgniter}
                   value={igniter}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-                  // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
-            </View>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize6, height: portraitRowHeight1, marginLeft: 5, marginRight: 5,justifyContent:'center',alignItems:'center',flexDirection: 'row' }]} >
-              <Text style={[stylesPortrait.textValueMonitor,{color:'#fff',fontWeight:'bold',color:'#fff'}]}>COOLING</Text>
-              <Switch
+              </View>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>COOLING</Text>
+                <Switch
+                  // key={data.lampu_id}
+                  trackColor={{ false: "#767577", true: "#767577" }}
+                  thumbColor={cooling ? "#6CB6D1" : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={toggleSwitchCooling}
+                  value={cooling}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
+                />
+              </View>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>AGITATOR</Text>
+                <Switch
+                  // key={data.lampu_id}
+                  trackColor={{ false: "#767577", true: "#767577" }}
+                  thumbColor={agitator ? "#6CB6D1" : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={toggleSwitchAgitator}
+                  value={agitator}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
+                />
+              </View>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>LAMP</Text>
+                <Switch
+                  // key={data.lampu_id}
+                  trackColor={{ false: "#767577", true: "#767577" }}
+                  thumbColor={lamp ? "#6CB6D1" : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={toggleSwitchLamp}
+                  value={lamp}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
+                />
+              </View>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>AUTO</Text>
+                <Switch
+                  // key={data.lampu_id}
+                  trackColor={{ false: "#767577", true: "#767577" }}
+                  thumbColor={auto ? "#6CB6D1" : "#f4f3f4"}
+                  ios_backgroundColor="#3e3e3e"
+                  onValueChange={toggleSwitchAuto}
+                  value={auto}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
+                />
+              </View>
+              {/* <View style={[stylesPortrait.cell, { width: portraitCellSize6, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', flexDirection: 'row' }]} >
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff' }]}>COOLING</Text>
+                <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
                   thumbColor={cooling ? "#6CB6D1" : "#f4f3f4"}
@@ -758,15 +945,16 @@ export function Roasting({ navigation }) {
                   onValueChange={toggleSwitchCooling}
                   value={cooling}
                   style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
-                  // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
+                // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
+              </View> */}
             </View>
-          </View>
-          <View style={stylesPortrait.row}>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5 ,backgroundColor:'#666262',borderColor:'#666262', justifyContent: 'center', alignItems: 'center'}]} >
-            <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>PILIH MESIN</Text>
+            <View style={stylesPortrait.row}>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize4, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, backgroundColor: '#666262', borderColor: '#666262', justifyContent: 'center', alignItems: 'center' }]} >
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>SETUP PROFILE</Text>
+              </View>
             </View>
-          </View>
+          </ScrollView>
         </ScrollView>
       );
     }

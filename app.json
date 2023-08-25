@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "TanBlack-Android",
-    "slug": "TanBlack-Android",
+    "name": "TB CR 2",
+    "slug": "TB-CR-2",
     "version": "1.0.0",
-    "orientation": "auto",
-    "icon": "./assets/tanblack.png",
+    "orientation": "portrait",
+    "icon": "./assets/adaptive-icon-1.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/tanblack.png",
+      "image": "./assets/splash-1.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000"
     },
     "packagerOpts": {
       "sourceExts": [
@@ -33,20 +33,17 @@
     "ios": {
       "supportsTablet": true
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/tanblack.png",
-        "backgroundColor": "#ffffff"
-      },
-      "package": "com.adityatrik1.TanBlackAndroid"
-    },
-    "web": {
-      "favicon": "./assets/tanblack.png"
-    },
     "extra": {
       "eas": {
-        "projectId": "b29d7a1a-909d-4628-b5ab-9b150c6473b5"
+        "projectId": "19a139f2-ce53-48eb-b425-c2754716094a"
       }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon-1.png",
+        "backgroundColor": "#000000"
+      },
+      "package": "com.adityatrik2.tanblackandroid"
     }
   }
 }
