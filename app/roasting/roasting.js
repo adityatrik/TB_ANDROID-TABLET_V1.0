@@ -30,22 +30,120 @@ const DataMesin = [
   },
 ];
 
-const data = [
-  [{ x: 0, y: 0 }, { x: 2, y: 10 }, { x: 10, y: 200 }, { x: 15, y: 250 }],
-  [{ x: 0, y: 0 }, { x: 2, y: 10 }, { x: 10, y: 20 }, { x: 4, y: 20 }, { x: 15, y: 25 }],
-  // [{ x: 0, y: 0 }, { x: 2, y:10 }, { x: 3, y:0 },{ x: 4, y: 10 }, { x: 15, y: 15 }],
-];
-
-const maxima = data.map(
-  (dataset) => Math.max(...dataset.map((d) => d.y))
-);
+const maxima = [250, 25];
 
 const xOffsets = [50, 555];
 const tickPadding = [0, -18];
 const anchors = ["end", "start"];
-const colors = ["blue", "red"];
+const colors = ["#cc0f51", "#147CB3", "#ff6708","#FFFFFF"];
 
 export function Roasting({ navigation }) {
+  const data = [
+    [{ x: 0, y: 30 }],
+    [{ x: 0, y: 30 }],
+    [{ x: 0, y: 0 }, { x: 0.5, y: 0 }, { x: 0.8, y: 0 }, { x: 0.9, y: 0 }, { x: 1, y: 0 }, { x: 1.5, y: 0 }, { x: 5, y: 0 }, { x: 7, y: 0 }, { x: 10, y: 0 }, { x: 12, y: 0 }, { x: 13, y: 0 }, { x: 14, y: 0 }],
+  ];
+
+  // const [count, setCount] = useState(50
+  const [isWsConnected, setWsIsConnected] = useState(false);
+  const [dataChart, setDataChart] = useState(data);
+  const [et, setEt] = useState('');
+  const [etInt, setEtInt] = useState(0);
+  const [bt, setBt] = useState('');
+
+  useEffect(() => {
+    const socket = new WebSocket("ws://192.168.100.232:81");
+
+    const connectWebSocket = () => {
+      const socket = new WebSocket("ws://192.168.100.232:81");
+      // socket.on('open', () => {
+      //   console.log('WebSocket connected');
+      //   setWsIsConnected(true);
+      // });
+      socket.onopen = () => {
+        console.log('WebSocket connected');
+        setWsIsConnected(true);
+        let count = 0;
+        // const countingInterval = setInterval(() => {
+        //   count += 0.017;
+        //   setDataChart((prevDataChart) => {
+        //     return prevDataChart.map((row, rowIndex) => {
+        //       if (rowIndex === 0) {
+        //         // Menambahkan kolom baru dengan nilai x dari perhitungan
+        //         return [
+        //           ...row,
+        //           { x: count, y: etInt } // Nilai y tetap menggunakan nilai dari kolom pertama
+        //         ];
+        //       }
+        //       return row;
+        //     });
+        //   });
+        // }, 1000);
+      }
+      let count = 0;
+      socket.onmessage = (event) => {
+        socket.send('{"command": "getData", "id": 24762, "roasterID": 0}');
+        // const data = event.data;
+        const parsedData = JSON.parse(event.data);
+        // Mengubah string menjadi float menggunakan parseFloat()
+        const etValue = parseFloat(parsedData.data.ET);
+        const btValue = parseFloat(parsedData.data.BT);
+        setEt(parsedData.data.ET);
+        setBt(parsedData.data.BT);
+        setEtInt(etValue);
+        // console.log(bt);
+        console.log(parsedData.data);
+        // Memulai perhitungan counting dan pengisian kolom baru
+
+        // setDataChart((prevDataChart) => {
+        //   const updatedData = prevDataChart.map((row, rowIndex) =>
+        //     row.map((prevItem, columnIndex) => {
+        //       if (rowIndex == 0 && columnIndex == 1) {
+        //         return { x: 10, y: btValue };
+        //       } else if (rowIndex == 1) {
+        //         return { x: prevItem.x, y: etValue };
+        //       }
+        //       else {
+        //         return prevItem;
+        //       }
+        //     })
+        //   );
+        count += 0.017;
+        setDataChart((prevDataChart) => {
+          return prevDataChart.map((row, rowIndex) => {
+            if (rowIndex === 0) {
+              // Menambahkan kolom baru dengan nilai x dari perhitungan
+              return [
+                ...row,
+                { x: count, y: btValue } // Nilai y tetap menggunakan nilai dari kolom pertama
+              ];
+            }else if (rowIndex === 1) {
+              return [
+                ...row,
+                { x: count, y: etValue } // Nilai y tetap menggunakan nilai dari kolom pertama
+              ];
+            }
+            return row;
+          });
+        });
+
+
+        socket.onclose = (code, reason) => {
+          console.log('WebSocket disconnected:', reason);
+          setWsIsConnected(false);
+
+          // Coba hubungkan ulang setelah 2 detik
+          setTimeout(() => {
+            connectWebSocket();
+          }, 2000);
+        }
+      };
+    }
+    connectWebSocket();
+    return () => {
+      socket.close();
+    };
+  }, []);
 
   const [modalVisible, setModalVisible] = useState(false);
   const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
@@ -88,7 +186,8 @@ export function Roasting({ navigation }) {
   const row2Height = (totalHeight * 6) / 10;
   const row3Height = (totalHeight * 1) / 10;
 
-  const xOffsetsPortrait = [50, portraitCellSize4 - 50];
+  const xOffsetsPortrait = [48, portraitCellSize4 - 50];
+  const xOffsetsLandscape = [48, cellSizeRow2_2 - 50];
   const handleDimensionsChange = ({ window }) => {
     const { width, height } = window;
     setWindowWidth(width);
@@ -581,6 +680,34 @@ export function Roasting({ navigation }) {
                 {data.map((d, i) => (
                   <VictoryAxis dependentAxis
                     key={i}
+                    offsetX={xOffsetsLandscape[i]}
+                    style={{
+                      axis: { stroke: 'white' },
+                      ticks: { padding: tickPadding[i] },
+                      tickLabels: { fill: 'white', textAnchor: anchors[i] }
+                    }}
+                    tickValues={[0.2, 0.4, 0.6, 0.8, 1]}
+                    tickFormat={(t) => t * maxima[i]}
+                  />
+                ))}
+                {data.map((d, i) => (
+                  <VictoryLine
+                    key={i}
+                    data={d}
+                    style={{ data: { stroke: colors[i] } }}
+                    y={(datum) => datum.y / maxima[i]}
+                  />
+                ))}
+              </VictoryChart>
+              {/* <VictoryChart
+                theme={VictoryTheme.material}
+                width={cellSizeRow2_2} height={1000}
+                domain={{ y: [0, 1] }}
+              >
+                <VictoryAxis />
+                {data.map((d, i) => (
+                  <VictoryAxis dependentAxis
+                    key={i}
                     offsetX={xOffsets[i]}
                     style={{
                       axis: { stroke: 'white' },
@@ -599,7 +726,7 @@ export function Roasting({ navigation }) {
                     y={(datum) => datum.y / maxima[i]}
                   />
                 ))}
-              </VictoryChart>
+              </VictoryChart> */}
               {/* <LineChart
                 data={lineChartData}
                 width={cellSizeRow2_2 - 4}
@@ -687,11 +814,11 @@ export function Roasting({ navigation }) {
           <View style={[stylesPortrait.row, { marginTop: 20 }]}>
             <View style={[stylesPortrait.cell, { width: portraitCellSize1, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, borderColor: '#FFF', backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }]} >
               <Text style={[stylesPortrait.textTitleMonitor, { color: '#FFF', fontSize: fontTitleMonitorSize }]}>BT (C)</Text>
-              <Text style={[stylesPortrait.textValueMonitor, { color: '#cc0f51', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>200</Text>
+              <Text style={[stylesPortrait.textValueMonitor, { color: '#cc0f51', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>{bt}</Text>
             </View>
             <View style={[stylesPortrait.cell, { width: portraitCellSize1, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, borderColor: '#FFF', backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }]} >
               <Text style={[stylesPortrait.textTitleMonitor, { color: '#FFF', fontSize: fontTitleMonitorSize }]}>ET (C)</Text>
-              <Text style={[stylesPortrait.textValueMonitor, { color: '#147CB3', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>200</Text>
+              <Text style={[stylesPortrait.textValueMonitor, { color: '#147CB3', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>{et}</Text>
             </View>
             <View style={[stylesPortrait.cell, { width: portraitCellSize1, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, borderColor: '#FFF', backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }]} >
               <Text style={[stylesPortrait.textTitleMonitor, { color: '#FFF', fontSize: fontTitleMonitorSize }]}>ROAST TIME</Text>
@@ -699,7 +826,7 @@ export function Roasting({ navigation }) {
             </View>
             <View style={[stylesPortrait.cell, { width: portraitCellSize1, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, borderColor: '#FFF', backgroundColor: '#000', justifyContent: 'center', alignItems: 'center' }]} >
               <Text style={[stylesPortrait.textTitleMonitor, { color: '#FFF', fontSize: fontTitleMonitorSize }]}>RoR (C/Min)</Text>
-              <Text style={[stylesPortrait.textValueMonitor, { color: '#ff6708', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>200</Text>
+              <Text style={[stylesPortrait.textValueMonitor, { color: '#ff6708', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>{etInt}</Text>
             </View>
           </View>
           <View style={stylesPortrait.row}>
@@ -730,7 +857,7 @@ export function Roasting({ navigation }) {
                   <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize, marginLeft: 3 }]}>ET</Text>
                 </View>
                 <View style={[stylesPortrait.cell, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderColor: '#000', marginHorizontal: 5 }]}>
-                  <View style={[stylesPortrait.cell, { width: 12, height: 12, justifyContent: 'center', alignItems: 'center', borderColor: '#cc0f51', backgroundColor: '#ff6708' }]} />
+                  <View style={[stylesPortrait.cell, { width: 12, height: 12, justifyContent: 'center', alignItems: 'center', borderColor: '#ff6708', backgroundColor: '#ff6708' }]} />
                   <Text style={[stylesPortrait.valueText, { fontSize: fontValueSliderSize, marginLeft: 3 }]}>RoR</Text>
                 </View>
                 <View style={[stylesPortrait.cell, { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderColor: '#000', marginHorizontal: 5 }]}>
@@ -748,27 +875,61 @@ export function Roasting({ navigation }) {
                 domain={{ y: [0, 1] }}
               >
                 <VictoryAxis />
-                {data.map((d, i) => (
-                  <VictoryAxis dependentAxis
-                    key={i}
-                    offsetX={xOffsetsPortrait[i]}
-                    style={{
-                      axis: { stroke: 'white' },
-                      ticks: { padding: tickPadding[i] },
-                      tickLabels: { fill: 'white', textAnchor: anchors[i] }
-                    }}
-                    tickValues={[0.2, 0.4, 0.6, 0.8, 1]}
-                    tickFormat={(t) => t * maxima[i]}
-                  />
-                ))}
-                {data.map((d, i) => (
+                <VictoryAxis dependentAxis
+                  key={0}
+                  offsetX={xOffsetsPortrait[0]}
+                  style={{
+                    axis: { stroke: 'white' },
+                    ticks: { padding: tickPadding[0] },
+                    tickLabels: { fill: 'white', textAnchor: anchors[0] }
+                  }}
+                  tickValues={[0.2, 0.4, 0.6, 0.8, 1]}
+                  tickFormat={(t) => t * maxima[0]}
+                />
+                <VictoryAxis dependentAxis
+                  key={1}
+                  offsetX={xOffsetsPortrait[1]}
+                  style={{
+                    axis: { stroke: 'white' },
+                    ticks: { padding: tickPadding[1] },
+                    tickLabels: { fill: 'white', textAnchor: anchors[1] }
+                  }}
+                  tickValues={[0.2, 0.4, 0.6, 0.8, 1]}
+                  tickFormat={(t) => t * maxima[1]}
+                />
+
+                <VictoryLine
+                  key={0}
+                  data={dataChart[0]}
+                  style={{ data: { stroke: colors[0] } }}
+                  y={(datum) => datum.y / maxima[0]}
+                />
+                <VictoryLine
+                  key={0}
+                  data={dataChart[1]}
+                  style={{ data: { stroke: colors[1] } }}
+                  y={(datum) => datum.y / maxima[0]}
+                />
+                <VictoryLine
+                  key={0}
+                  data={dataChart[2]}
+                  style={{ data: { stroke: colors[2] } }}
+                  y={(datum) => datum.y / maxima[0]}
+                />
+                {/* <VictoryLine
+                  key={0}
+                  data={data[2]}
+                  style={{ data: { stroke: colors[2] } }}
+                  y={(datum) => datum.y / maxima[1]}
+                /> */}
+                {/* {data.map((d, i) => (
                   <VictoryLine
                     key={i}
                     data={d}
                     style={{ data: { stroke: colors[i] } }}
-                  // y={(datum) => datum.y / maxima[i]}
+                    y={(datum) => datum.y / maxima[i]}
                   />
-                ))}
+                ))} */}
               </VictoryChart>
             </View>
           </View>
@@ -871,7 +1032,7 @@ export function Roasting({ navigation }) {
             </View>
             <View style={stylesPortrait.row}>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>IGINITER</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>IGINITER</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -884,7 +1045,7 @@ export function Roasting({ navigation }) {
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>COOLING</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>COOLING</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -897,7 +1058,7 @@ export function Roasting({ navigation }) {
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>AGITATOR</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>AGITATOR</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -910,7 +1071,7 @@ export function Roasting({ navigation }) {
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>LAMP</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>LAMP</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -923,7 +1084,7 @@ export function Roasting({ navigation }) {
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: -10 }]}>AUTO</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>AUTO</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
