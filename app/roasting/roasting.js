@@ -35,10 +35,11 @@ const maxima = [250, 25];
 const xOffsets = [50, 555];
 const tickPadding = [0, -18];
 const anchors = ["end", "start"];
-const colors = ["#cc0f51", "#147CB3", "#ff6708","#FFFFFF"];
+const colors = ["#cc0f51", "#147CB3", "#ff6708", "#FFFFFF"];
 
 export function Roasting({ navigation }) {
   const data = [
+    [{ x: 0, y: 30 }],
     [{ x: 0, y: 30 }],
     [{ x: 0, y: 30 }],
     [{ x: 0, y: 0 }, { x: 0.5, y: 0 }, { x: 0.8, y: 0 }, { x: 0.9, y: 0 }, { x: 1, y: 0 }, { x: 1.5, y: 0 }, { x: 5, y: 0 }, { x: 7, y: 0 }, { x: 10, y: 0 }, { x: 12, y: 0 }, { x: 13, y: 0 }, { x: 14, y: 0 }],
@@ -50,100 +51,84 @@ export function Roasting({ navigation }) {
   const [et, setEt] = useState('');
   const [etInt, setEtInt] = useState(0);
   const [bt, setBt] = useState('');
+  const [socket, setSocket] = useState(null);
+  const [switchValue, setSwitchValue] = useState(false);
+  const [receivedMessage, setReceivedMessage] = useState('');
+  const [counter, setCounter] = useState(10000);
 
   useEffect(() => {
-    const socket = new WebSocket("ws://192.168.100.232:81");
+    const newSocket = new WebSocket('ws://192.168.100.232:81');
+    setSocket(newSocket);
+    let count = 0;
+    newSocket.onmessage = (event) => {
+      setReceivedMessage(event.data);
+      const parsedData = JSON.parse(event.data);
+      // Mengubah string menjadi float menggunakan parseFloat()
+      const etValue = parseFloat(parsedData.data.ET);
+      const btValue = parseFloat(parsedData.data.BT);
+      setEt(parsedData.data.ET);
+      setBt(parsedData.data.BT);
+      setEtInt(etValue);
+      // console.log(bt);
+      console.log(parsedData.data);
+      // Memulai perhitungan counting dan pengisian kolom baru
 
-    const connectWebSocket = () => {
-      const socket = new WebSocket("ws://192.168.100.232:81");
-      // socket.on('open', () => {
-      //   console.log('WebSocket connected');
-      //   setWsIsConnected(true);
-      // });
-      socket.onopen = () => {
-        console.log('WebSocket connected');
-        setWsIsConnected(true);
-        let count = 0;
-        // const countingInterval = setInterval(() => {
-        //   count += 0.017;
-        //   setDataChart((prevDataChart) => {
-        //     return prevDataChart.map((row, rowIndex) => {
-        //       if (rowIndex === 0) {
-        //         // Menambahkan kolom baru dengan nilai x dari perhitungan
-        //         return [
-        //           ...row,
-        //           { x: count, y: etInt } // Nilai y tetap menggunakan nilai dari kolom pertama
-        //         ];
-        //       }
-        //       return row;
-        //     });
-        //   });
-        // }, 1000);
-      }
-      let count = 0;
-      socket.onmessage = (event) => {
-        socket.send('{"command": "getData", "id": 24762, "roasterID": 0}');
-        // const data = event.data;
-        const parsedData = JSON.parse(event.data);
-        // Mengubah string menjadi float menggunakan parseFloat()
-        const etValue = parseFloat(parsedData.data.ET);
-        const btValue = parseFloat(parsedData.data.BT);
-        setEt(parsedData.data.ET);
-        setBt(parsedData.data.BT);
-        setEtInt(etValue);
-        // console.log(bt);
-        console.log(parsedData.data);
-        // Memulai perhitungan counting dan pengisian kolom baru
-
-        // setDataChart((prevDataChart) => {
-        //   const updatedData = prevDataChart.map((row, rowIndex) =>
-        //     row.map((prevItem, columnIndex) => {
-        //       if (rowIndex == 0 && columnIndex == 1) {
-        //         return { x: 10, y: btValue };
-        //       } else if (rowIndex == 1) {
-        //         return { x: prevItem.x, y: etValue };
-        //       }
-        //       else {
-        //         return prevItem;
-        //       }
-        //     })
-        //   );
-        count += 0.017;
-        setDataChart((prevDataChart) => {
-          return prevDataChart.map((row, rowIndex) => {
-            if (rowIndex === 0) {
-              // Menambahkan kolom baru dengan nilai x dari perhitungan
-              return [
-                ...row,
-                { x: count, y: btValue } // Nilai y tetap menggunakan nilai dari kolom pertama
-              ];
-            }else if (rowIndex === 1) {
-              return [
-                ...row,
-                { x: count, y: etValue } // Nilai y tetap menggunakan nilai dari kolom pertama
-              ];
-            }
-            return row;
-          });
+      // setDataChart((prevDataChart) => {
+      //   const updatedData = prevDataChart.map((row, rowIndex) =>
+      //     row.map((prevItem, columnIndex) => {
+      //       if (rowIndex == 0 && columnIndex == 1) {
+      //         return { x: 10, y: btValue };
+      //       } else if (rowIndex == 1) {
+      //         return { x: prevItem.x, y: etValue };
+      //       }
+      //       else {
+      //         return prevItem;
+      //       }
+      //     })
+      //   );
+      count += 0.017;
+      setDataChart((prevDataChart) => {
+        return prevDataChart.map((row, rowIndex) => {
+          if (rowIndex === 0) {
+            // Menambahkan kolom baru dengan nilai x dari perhitungan
+            return [
+              ...row,
+              { x: count, y: btValue } // Nilai y tetap menggunakan nilai dari kolom pertama
+            ];
+          } else if (rowIndex === 1) {
+            return [
+              ...row,
+              { x: count, y: etValue } // Nilai y tetap menggunakan nilai dari kolom pertama
+            ];
+          } else if (rowIndex === 2) {
+            return [
+              ...row,
+              { x: count, y: 15 } // Nilai y tetap menggunakan nilai dari kolom pertama
+            ];
+          }
+          return row;
         });
+      });
+    };
 
-
-        socket.onclose = (code, reason) => {
-          console.log('WebSocket disconnected:', reason);
-          setWsIsConnected(false);
-
-          // Coba hubungkan ulang setelah 2 detik
-          setTimeout(() => {
-            connectWebSocket();
-          }, 2000);
-        }
-      };
-    }
-    connectWebSocket();
     return () => {
-      socket.close();
+      newSocket.close();
     };
   }, []);
+
+  useEffect(() => {
+    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
+    sendDataToServer();
+  }, [counter]);
+
+  const sendDataToServer = () => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      const newData1 = '{"command": "getData", "id": 24762, "roasterID": 0}';
+      console.log(newData1);
+      socket.send(newData1);
+    }
+  };
+
 
   const [modalVisible, setModalVisible] = useState(false);
   const [windowWidth, setWindowWidth] = useState(Dimensions.get('window').width);
@@ -214,15 +199,35 @@ export function Roasting({ navigation }) {
 
   const changeAir = (newValue) => {
     setAir(newValue);
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      var newData = `{"command": "setOutput","fan1":"${newValue}"}`;
+      console.log(newData);
+      socket.send(newData);
+    }
   };
   const changeBurner = (newValue) => {
     setBurner(newValue);
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      var newData = `{"command": "setOutput","burner":"${newValue}"}`;
+      console.log(newData);
+      socket.send(newData);
+    }
   };
   const changeDrum = (newValue) => {
     setDrum(newValue);
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      var newData = `{"command": "setOutput","drum":"${newValue}"}`;
+      console.log(newData);
+      socket.send(newData);
+    }
   };
   const changeSv = (newValue) => {
     setSv(newValue);
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      var newData = `{"command": "setOutput","sv":"${newValue}"}`;
+      console.log(newData);
+      socket.send(newData);
+    }
   };
   const [orientation, setOrientation] = useState('portrait');
 
@@ -911,9 +916,15 @@ export function Roasting({ navigation }) {
                   y={(datum) => datum.y / maxima[0]}
                 />
                 <VictoryLine
-                  key={0}
+                  key={1}
                   data={dataChart[2]}
                   style={{ data: { stroke: colors[2] } }}
+                  y={(datum) => datum.y / maxima[1]}
+                />
+                <VictoryLine
+                  key={1}
+                  data={dataChart[3]}
+                  style={{ data: { stroke:'white' } }}
                   y={(datum) => datum.y / maxima[0]}
                 />
                 {/* <VictoryLine
@@ -1032,7 +1043,7 @@ export function Roasting({ navigation }) {
             </View>
             <View style={stylesPortrait.row}>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>IGINITER</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize,marginTop:10 }]}>IGINITER</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1040,12 +1051,12 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchIgniter}
                   value={igniter}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: 0 ,marginTop: -10}}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>COOLING</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize,marginTop:10}]}>COOLING</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1053,12 +1064,12 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchCooling}
                   value={cooling}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],marginTop:-10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>AGITATOR</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop:10 }]}>AGITATOR</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1066,12 +1077,12 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchAgitator}
                   value={agitator}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop:-10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>LAMP</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop:10 }]}>LAMP</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1079,12 +1090,12 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchLamp}
                   value={lamp}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop:-10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginBottom: 0 }]}>AUTO</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop:10 }]}>AUTO</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1092,7 +1103,7 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchAuto}
                   value={auto}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: -10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop:-10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
