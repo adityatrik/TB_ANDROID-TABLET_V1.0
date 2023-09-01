@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Switch, FlatList, Modal, TouchableOpacity, View, StyleSheet, Dimensions, ScrollView, Text, SafeAreaView } from 'react-native';
+import { Switch, FlatList, Modal, TouchableOpacity, View, StyleSheet, Dimensions, ScrollView, Text, SafeAreaView, RefreshControl } from 'react-native';
 import Slider from '@react-native-community/slider';
 import RF from 'react-native-responsive-fontsize';
 // import { LineChart } from 'react-native-svg-charts';
@@ -41,7 +41,7 @@ export function Roasting({ navigation }) {
   const data = [
     [{ x: 0, y: 30 }],
     [{ x: 0, y: 30 }],
-    [{ x: 0, y: 30 }],
+    [{ x: 0, y: 0 }],
     [{ x: 0, y: 0 }, { x: 0.5, y: 0 }, { x: 0.8, y: 0 }, { x: 0.9, y: 0 }, { x: 1, y: 0 }, { x: 1.5, y: 0 }, { x: 5, y: 0 }, { x: 7, y: 0 }, { x: 10, y: 0 }, { x: 12, y: 0 }, { x: 13, y: 0 }, { x: 14, y: 0 }],
   ];
 
@@ -55,6 +55,7 @@ export function Roasting({ navigation }) {
   const [switchValue, setSwitchValue] = useState(false);
   const [receivedMessage, setReceivedMessage] = useState('');
   const [counter, setCounter] = useState(10000);
+  const [msgId, setMsgId] = useState(0);
 
   useEffect(() => {
     const newSocket = new WebSocket('ws://192.168.100.232:81');
@@ -63,29 +64,12 @@ export function Roasting({ navigation }) {
     newSocket.onmessage = (event) => {
       setReceivedMessage(event.data);
       const parsedData = JSON.parse(event.data);
-      // Mengubah string menjadi float menggunakan parseFloat()
+      const xAxis = parseFloat(parsedData.id / 60);
+      console.log(xAxis);
       const etValue = parseFloat(parsedData.data.ET);
       const btValue = parseFloat(parsedData.data.BT);
       setEt(parsedData.data.ET);
       setBt(parsedData.data.BT);
-      setEtInt(etValue);
-      // console.log(bt);
-      console.log(parsedData.data);
-      // Memulai perhitungan counting dan pengisian kolom baru
-
-      // setDataChart((prevDataChart) => {
-      //   const updatedData = prevDataChart.map((row, rowIndex) =>
-      //     row.map((prevItem, columnIndex) => {
-      //       if (rowIndex == 0 && columnIndex == 1) {
-      //         return { x: 10, y: btValue };
-      //       } else if (rowIndex == 1) {
-      //         return { x: prevItem.x, y: etValue };
-      //       }
-      //       else {
-      //         return prevItem;
-      //       }
-      //     })
-      //   );
       count += 0.017;
       setDataChart((prevDataChart) => {
         return prevDataChart.map((row, rowIndex) => {
@@ -93,17 +77,17 @@ export function Roasting({ navigation }) {
             // Menambahkan kolom baru dengan nilai x dari perhitungan
             return [
               ...row,
-              { x: count, y: btValue } // Nilai y tetap menggunakan nilai dari kolom pertama
+              { x: xAxis, y: btValue } // Nilai y tetap menggunakan nilai dari kolom pertama
             ];
           } else if (rowIndex === 1) {
             return [
               ...row,
-              { x: count, y: etValue } // Nilai y tetap menggunakan nilai dari kolom pertama
+              { x: xAxis, y: etValue } // Nilai y tetap menggunakan nilai dari kolom pertama
             ];
           } else if (rowIndex === 2) {
             return [
               ...row,
-              { x: count, y: 15 } // Nilai y tetap menggunakan nilai dari kolom pertama
+              { x: xAxis, y: 15 } // Nilai y tetap menggunakan nilai dari kolom pertama
             ];
           }
           return row;
@@ -117,13 +101,27 @@ export function Roasting({ navigation }) {
   }, []);
 
   useEffect(() => {
-    counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
-    sendDataToServer();
+    // counter > 0 && setTimeout(() => setCounter(counter - 1), 10);
+    // sendDataToServer();
+    const intervalId = setInterval(() => {
+      setMsgId(msgId + 1);
+      // Lakukan pengiriman data atau aksi yang diinginkan di sini
+      // console.log('Mengirim data...');
+      // Misalnya, kirim data ke server atau lakukan manipulasi state lainnya
+      sendDataToServer();
+      // Update nilai counter
+      setCounter(prevCounter => prevCounter - 1);
+    }, 1000); // Timer setiap 1000ms (1 detik)
+
+    // Cleanup effect: Clear interval saat komponen di-unmount
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [counter]);
 
   const sendDataToServer = () => {
     if (socket && socket.readyState === WebSocket.OPEN) {
-      const newData1 = '{"command": "getData", "id": 24762, "roasterID": 0}';
+      const newData1 = `{"command": "getData", "id": ${msgId}, "roasterID": 0}`;
       console.log(newData1);
       socket.send(newData1);
     }
@@ -229,9 +227,22 @@ export function Roasting({ navigation }) {
       socket.send(newData);
     }
   };
+  const handleReset = () => {
+    const dataReset = [
+      [{ x: 0, y: 30 }],
+      [{ x: 0, y: 30 }],
+      [{ x: 0, y: 0 }],
+      [{ x: 0, y: 0 }, { x: 0.5, y: 0 }, { x: 0.8, y: 0 }, { x: 0.9, y: 0 }, { x: 1, y: 0 }, { x: 1.5, y: 0 }, { x: 5, y: 0 }, { x: 7, y: 0 }, { x: 10, y: 0 }, { x: 12, y: 0 }, { x: 13, y: 0 }, { x: 14, y: 0 }],
+    ];
+    setDataChart(dataReset);
+    setMsgId(0);
+  };
+
+  const handleBerhenti = () => {
+    console.log('Stop Recording');
+    setCounter(0);
+  };
   const [orientation, setOrientation] = useState('portrait');
-
-
   const [stylesSelection, setStylesSelection] = useState([]);
   const styles = StyleSheet.create(stylesSelection);
 
@@ -603,7 +614,7 @@ export function Roasting({ navigation }) {
             <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#24CF15', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textItem, { color: '#FFF' }]}>MULAI</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#ff6708', justifyContent: 'center', alignItems: 'center' }]}>
+            <TouchableOpacity onPress={handleReset} style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: '#ff6708', justifyContent: 'center', alignItems: 'center' }]}>
               <Text style={[styles.textItem, { color: '#FFF' }]}>RESET</Text>
             </TouchableOpacity>
             <View style={[styles.cell, { width: cellSizeRow1, marginLeft: 5, marginRight: 5, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }]}>
@@ -687,6 +698,7 @@ export function Roasting({ navigation }) {
                     key={i}
                     offsetX={xOffsetsLandscape[i]}
                     style={{
+
                       axis: { stroke: 'white' },
                       ticks: { padding: tickPadding[i] },
                       tickLabels: { fill: 'white', textAnchor: anchors[i] }
@@ -704,6 +716,8 @@ export function Roasting({ navigation }) {
                   />
                 ))}
               </VictoryChart>
+
+
               {/* <VictoryChart
                 theme={VictoryTheme.material}
                 width={cellSizeRow2_2} height={1000}
@@ -835,15 +849,17 @@ export function Roasting({ navigation }) {
             </View>
           </View>
           <View style={stylesPortrait.row}>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize2, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#24CF15', borderColor: '#24CF15' }]} >
-              <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>MULAI</Text>
-            </View>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize2, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ff6708', borderColor: '#ff6708' }]} >
+            <TouchableOpacity>
+              <View style={[stylesPortrait.cell, { width: portraitCellSize2, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#24CF15', borderColor: '#24CF15' }]} >
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>MULAI</Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleReset} style={[stylesPortrait.cell, { width: portraitCellSize2, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#ff6708', borderColor: '#ff6708' }]} >
               <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>RESET</Text>
-            </View>
-            <View style={[stylesPortrait.cell, { width: portraitCellSize2, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#EA1F1F', borderColor: '#EA1F1F' }]} >
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleBerhenti} style={[stylesPortrait.cell, { width: portraitCellSize2, height: portraitRowHeight1, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', backgroundColor: '#EA1F1F', borderColor: '#EA1F1F' }]} >
               <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontSize: fontValueMonitorSize, fontWeight: 'bold' }]}>BERHENTI</Text>
-            </View>
+            </TouchableOpacity>
           </View>
           <View style={stylesPortrait.row}>
             <View style={[stylesPortrait.cell, { width: portraitCellSize3, height: portraitRowHeight3, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center', borderColor: '#000' }]} >
@@ -924,7 +940,7 @@ export function Roasting({ navigation }) {
                 <VictoryLine
                   key={1}
                   data={dataChart[3]}
-                  style={{ data: { stroke:'white' } }}
+                  style={{ data: { stroke: 'white' } }}
                   y={(datum) => datum.y / maxima[0]}
                 />
                 {/* <VictoryLine
@@ -1043,7 +1059,7 @@ export function Roasting({ navigation }) {
             </View>
             <View style={stylesPortrait.row}>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize,marginTop:10 }]}>IGINITER</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop: 10 }]}>IGINITER</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1051,12 +1067,12 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchIgniter}
                   value={igniter}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: 0 ,marginTop: -10}}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginBottom: 0, marginTop: -10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize,marginTop:10}]}>COOLING</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop: 10 }]}>COOLING</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1064,12 +1080,12 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchCooling}
                   value={cooling}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],marginTop:-10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop: -10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop:10 }]}>AGITATOR</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop: 10 }]}>AGITATOR</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1077,12 +1093,12 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchAgitator}
                   value={agitator}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop:-10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop: -10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop:10 }]}>LAMP</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop: 10 }]}>LAMP</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1090,12 +1106,12 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchLamp}
                   value={lamp}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop:-10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop: -10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
               <View style={[stylesPortrait.cell, { width: portraitCellSize7, height: portraitRowHeight4, marginLeft: 5, marginRight: 5, justifyContent: 'center', alignItems: 'center' }]} >
-                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop:10 }]}>AUTO</Text>
+                <Text style={[stylesPortrait.textValueMonitor, { color: '#fff', fontWeight: 'bold', color: '#fff', fontSize: fontEventSize, marginTop: 10 }]}>AUTO</Text>
                 <Switch
                   // key={data.lampu_id}
                   trackColor={{ false: "#767577", true: "#767577" }}
@@ -1103,7 +1119,7 @@ export function Roasting({ navigation }) {
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={toggleSwitchAuto}
                   value={auto}
-                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop:-10 }}
+                  style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }], marginTop: -10 }}
                 // thumbStyle={stylesPortrait.smallThumb} // Menggunakan properti thumbStyle
                 />
               </View>
