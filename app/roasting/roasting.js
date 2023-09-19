@@ -58,14 +58,14 @@ export function Roasting({ navigation }) {
   const [msgId, setMsgId] = useState(0);
 
   useEffect(() => {
-    const newSocket = new WebSocket('ws://192.168.100.232:81');
+    const newSocket = new WebSocket('ws://192.168.100.220:81');
     setSocket(newSocket);
     let count = 0;
     newSocket.onmessage = (event) => {
       setReceivedMessage(event.data);
       const parsedData = JSON.parse(event.data);
       const xAxis = parseFloat(parsedData.id / 60);
-      console.log(xAxis);
+      console.log(event);
       const etValue = parseFloat(parsedData.data.ET);
       const btValue = parseFloat(parsedData.data.BT);
       setEt(parsedData.data.ET);
